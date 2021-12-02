@@ -5,46 +5,17 @@ const rawInput = readInput();
 const input = rawInput.split('\n').map(Number);
 
 /* Functions */
-
-function getIncrements(values: number[]) {
-  //   return values
-  //     .map((v, idx, arr) => {
-  //       if (idx > 0) {
-  //         return arr[idx] > arr[idx - 1] ? 1 : 0;
-  //       } else {
-  //         return 0;
-  //       }
-  //     })
-  //     .reduce((sum, curr) => sum + curr, 0);
-  return values.reduce(
-    (retVal, curr) => {
-      const { prevValue, counter } = retVal;
-
-      if (!prevValue) {
-        return {
-          ...retVal,
-          prevValue: curr,
-        };
-      } else {
-        // const doesIncrement = curr - prevValue > incrementDepth;
-        const doesIncrement = curr - prevValue > 0;
-        return {
-          prevValue: curr,
-          counter: doesIncrement ? counter + 1 : counter,
-        };
-      }
-    },
-    { prevValue: null, counter: 0 },
-  ).counter;
-}
+const summation = (sum, curr) => sum + curr;
+const isGreaterThanPrevious = (val, idx, arr) => (val > arr[idx - 1] ? 1 : 0);
+const greaterThanSummation = (values: number[]) => values.map(isGreaterThanPrevious).reduce(summation, 0);
 
 function part1(values: number[]): number {
-  return getIncrements(values);
+  return greaterThanSummation(values);
 }
 
 function part2(values: number[]): number {
-  const theeMeasurements = values.map((v, idx, arr) => (idx > 1 ? v + arr[idx - 1] + arr[idx - 2] : 0));
-  return getIncrements(theeMeasurements);
+  const theeMeasurements = values.map((v, idx, arr) => v + arr[idx - 1] + arr[idx - 2]).slice(2);
+  return greaterThanSummation(theeMeasurements);
 }
 
 /* Tests */
@@ -61,4 +32,7 @@ const resultPart2 = part2(input);
 console.timeEnd('Time');
 
 console.log('Solution to part 1:', resultPart1);
+assert.strictEqual(part1(input), 1342);
+
 console.log('Solution to part 2:', resultPart2);
+assert.strictEqual(part2(input), 1378);
