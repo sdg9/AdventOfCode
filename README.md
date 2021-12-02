@@ -2,21 +2,24 @@
 
 This is my personal playground for [advent of code](https://adventofcode.com/), implemented in typescript.
 
-### Scaffolding
+### One Time Setup
 
-To pull in your input dynamically create a .env file with your advent of code session cookie value. You can find this by logging into advent of code and viewing your cookie/inspecting your request headers in the chrome developer console or similar tools. See the .env.example as what your .env file should look like.
+1. Clone this repo `git clone https://github.com/sdg9/AdventOfCode`
+2. Install dependencies `npm i`
+3. To automate reading of your Advent Of Code puzzle input create a `.env` file at the root of this project with the value `session=<your advent of code session cookie value>`. Then when you generate each day's script it will pull in your associated puzzle input.
 
-Run `npm run generate` and follow the prompts to select the year and day you plan to scaffold, or run `npm run generate <year> <day>`.
+### How to Generate a new day
 
-The this command will both scaffold the boilerplate code required for the specified year & day as well as output the command to execute that year & day as well as copy it to your clipboard so you can paste it in a terminal and run quickly.
+1. Ensure one time setup is complete
+2. Run `npm run generate` and follow the prompts, or run `npm run generate <year> <day>`, e.g. `npm run generate 2021 01` for day 1 of 2021.
 
-If you do not populate your session cookie your input.txt file that is scaffolded will have the text `error` in it, you can simply copy the input manually from the website into this file.
+Now you can work on `src/<year>/<day>/index.ts` and `src/<year>/<day>/input.txt` should be populated with your puzzle input for the day (if input.txt only contains the text `error` make sure your .env file is properly configured).
 
-### Example execution
+### Execute your script
 
-`npm run dev src\2021\01`
+1. Run `npm run dev src\<year>\<day>` e.g. `npm run dev src\2021\01` for day 1 of 2021
 
-Will run the script for day 1 of 2021 in watch mode so that whenever a code change happens the script executes again.
+This will also enter watch mode so that whenever a code change happens the script executes again.
 
 e.g.
 
