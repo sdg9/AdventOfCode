@@ -14,6 +14,36 @@ If you do not populate your session cookie your input.txt file that is scaffolde
 
 ### Example execution
 
-`npm run dev src\2018\01`
+`npm run dev src\2021\01`
 
-Will run the script for day 1 of 2018.
+Will run the script for day 1 of 2021 in watch mode so that whenever a code change happens the script executes again.
+
+e.g.
+
+```typescript
+➜  AdventOfCode git:(main) npm run dev src/2021/01
+
+> node-proxy@1.0.0 dev
+> nodemon "src/2021/01"
+
+[nodemon] 2.0.4
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): src/**/*
+[nodemon] watching extensions: ts
+[nodemon] starting `ts-node src/2021/01`
+Time: 0.335ms
+Solution to part 1: 1342
+Solution to part 2: 1378
+[nodemon] clean exit - waiting for changes before restart
+```
+
+and then on edit of a file
+
+```typescript
+[nodemon] restarting due to changes...
+[nodemon] starting `ts-node src/2021/01`
+Time: 0.338ms
+Solution to part 1: 1342
+Solution to part 2: 1378
+[nodemon] clean exit - waiting for changes before restart
+```
