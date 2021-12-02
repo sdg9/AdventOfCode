@@ -50,3 +50,9 @@ Solution to part 1: 1342
 Solution to part 2: 1378
 [nodemon] clean exit - waiting for changes before restart
 ```
+
+### Preferred IDE
+
+Unsurprisingly I use [VSCode](https://code.visualstudio.com/)
+
+- I recommend the [Prettier - Code Formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) plugin. If it's not formatting on save try "Shift + Alt + F" and typically you'll presented with a prompt on what plugin you want to use to format, choose this prettier plugin. From here on out every time you save a file it should auto format according to your prettier config.
