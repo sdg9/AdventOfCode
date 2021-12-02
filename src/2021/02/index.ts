@@ -48,6 +48,11 @@ function part2(values: string[]): number {
   return horizontal * depth;
 }
 
+/* Tests */
+
+assert.strictEqual(part1(['forward 5', 'down 5', 'forward 8', 'up 3', 'down 8', 'forward 2']), 150);
+assert.strictEqual(part1(input), 1693300);
+
 assert.strictEqual(part2(['forward 5', 'down 5', 'forward 8', 'up 3', 'down 8', 'forward 2']), 900);
 assert.strictEqual(part2(input), 1857958050);
 
