@@ -11,16 +11,20 @@ const input = rawInput.split('\n').map(String);
  * While somewhat redundant child nodes named zero will have a key of '0' and one a key of '1'
  */
 export class TreeNode<T> {
-  key: string;
+  value: string;
   quantity: number;
   zero: TreeNode<T>;
   one: TreeNode<T>;
 
-  constructor(val: string) {
-    this.key = val;
+  constructor(val?: string) {
+    this.value = val;
     this.quantity = 0;
     this.zero = null;
     this.one = null;
+  }
+
+  getValueString() {
+    return this.value ?? '';
   }
 
   hasChild() {
@@ -33,6 +37,11 @@ export class TreeNode<T> {
     return 1 + Math.max(0, leftDepth, rightDepth);
   }
 
+  /**
+   *
+   * @param val String of length 1
+   * @returns
+   */
   addChild(val: string) {
     if (val === '1') {
       if (this.one == null) this.one = new TreeNode(val);
@@ -44,6 +53,17 @@ export class TreeNode<T> {
       return this.zero;
     }
   }
+  /**
+   *
+   * @param val String of any length
+   */
+  addChildren(val: string) {
+    if (val.length === 0) {
+      return;
+    }
+    const node = this.addChild(val[0]);
+    node.addChildren(val.slice(1));
+  }
 
   /**
    * Ties to the right
@@ -51,12 +71,11 @@ export class TreeNode<T> {
    */
   getPathMostTravelled<T>() {
     const oneMoreFrequent = this.one?.quantity >= this.zero?.quantity;
-    const oneAsDeep = this.one?.depth() >= this.zero?.depth();
+    const isOneDeadEnd = this.one?.depth() < this.zero?.depth();
 
-    const oneWins = (oneMoreFrequent && oneAsDeep) || this.zero == null;
-    const selfKey = this.key ?? '';
-    const childKey = (oneWins ? this.one?.getPathMostTravelled() : this.zero?.getPathMostTravelled()) ?? '';
-    return selfKey + childKey;
+    const oneWins = oneMoreFrequent && !isOneDeadEnd;
+    const childValues = (oneWins ? this.one?.getPathMostTravelled() : this.zero?.getPathMostTravelled()) ?? '';
+    return this.getValueString() + childValues;
   }
   /**
    * Ties to the left
@@ -64,51 +83,41 @@ export class TreeNode<T> {
    */
   getPathLeastTravelled<T>() {
     const zeroLessFrequent = this.zero?.quantity <= this.one?.quantity;
-    const zeroAsDeep = this.zero?.depth() >= this.one?.depth();
+    const isZeroDeadEnd = this.zero?.depth() < this.one?.depth();
 
-    const zeroWins = (zeroLessFrequent && zeroAsDeep) || this.one == null;
-    const selfKey = this.key ?? '';
-    const childKey = (zeroWins ? this.zero?.getPathLeastTravelled() : this.one?.getPathLeastTravelled()) ?? '';
-    return selfKey + childKey;
+    const zeroWins = (zeroLessFrequent && !isZeroDeadEnd) || this.one == null;
+    const childValues = (zeroWins ? this.zero?.getPathLeastTravelled() : this.one?.getPathLeastTravelled()) ?? '';
+    return this.getValueString() + childValues;
   }
-}
 
-/**
- * Builds binary tree where the root node doesn't represent a value (key is undefined)
- * @param values
- * @returns
- */
-function buildTree(values: string[]) {
-  let root = new TreeNode(undefined);
-  values.forEach((value) => {
-    let previousNode = root;
-    value.split('').forEach((char, idx) => {
-      previousNode = previousNode.addChild(char);
+  build(values: string[]) {
+    values.forEach((value) => {
+      this.addChildren(value);
     });
-  });
-  return root;
+    return this;
+  }
 }
 
 /* Functions */
 
-function part1(values: string[]): number {
-  let gamma = '';
-  let epsilon = '';
-  for (let i = 0; i < values[0].length; i++) {
-    let sum = 0;
-    for (let j = 0; j < values.length; j++) {
-      sum += parseInt(values[j][i], 10) === 1 ? 1 : -1;
-    }
-    const isOne = sum > 0;
-    gamma += isOne ? '1' : '0';
-    epsilon += isOne ? '0' : '1';
-  }
+const flipBit = (bit: number) => 1 - bit;
 
-  return parseInt(gamma, 2) * parseInt(epsilon, 2);
+function part1(values: string[]): number {
+  const binaryLength = values[0].length;
+  const emptyBinaryLengthArray = Array.apply(null, Array(binaryLength));
+  const gamma = emptyBinaryLengthArray.map((_, idx) => {
+    const bitSummationAtIndex = values.reduce((summation, currentBit) => summation + parseInt(currentBit[idx], 2), 0);
+    const mostFrequentBitAtIndex = Math.round(bitSummationAtIndex / values.length);
+    return mostFrequentBitAtIndex;
+  });
+
+  const epsilon = gamma.map(flipBit);
+
+  return parseInt(gamma.join(''), 2) * parseInt(epsilon.join(''), 2);
 }
 
 function part2(values: string[]): number {
-  let root = buildTree(values);
+  let root = new TreeNode().build(values);
 
   let o2Rating = root.getPathMostTravelled();
   let co2Rating = root.getPathLeastTravelled();
@@ -116,18 +125,6 @@ function part2(values: string[]): number {
   return parseInt(o2Rating, 2) * parseInt(co2Rating, 2);
 }
 
-/* Tests */
-
-assert.strictEqual(
-  part1(['00100', '11110', '10110', '10111', '10101', '01111', '00111', '11100', '10000', '11001', '00010', '01010']),
-  198,
-);
-assert.strictEqual(part1(input), 3882564);
-
-assert.strictEqual(
-  part2(['00100', '11110', '10110', '10111', '10101', '01111', '00111', '11100', '10000', '11001', '00010', '01010']),
-  230,
-);
 assert.strictEqual(part2(input), 3385170);
 
 /* Results */
