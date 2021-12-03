@@ -1,6 +1,6 @@
 import readInput from '../../utils/readInput';
 import assert from 'assert';
-import { BinaryString, TreeNode } from '../../utils/binaryTree';
+import { BinaryString, BinaryNumberTreeNode } from '../../utils/binaryNumberTree';
 
 const rawInput = readInput();
 const input = rawInput.split('\n').map(String);
@@ -24,7 +24,7 @@ function part1(values: string[]): number {
 }
 
 function part2(values: string[]): number {
-  let root = new TreeNode().build(values);
+  let root = new BinaryNumberTreeNode().build(values);
 
   let o2Rating = root.getPathMostTravelled();
   let co2Rating = root.getPathLeastTravelled();
