@@ -4,39 +4,44 @@ import assert from 'assert';
 const rawInput = readInput();
 const input = rawInput.split('\n').map(String);
 
-/* Binary Tree */
+/**
+ * Binary tree of a binary number
+ * instead of the typical this.left and this.right for a binary tree I just use this.zero
+ * and this.one respectively.
+ * While somewhat redundant child nodes named zero will have a key of '0' and one a key of '1'
+ */
 export class TreeNode<T> {
   key: string;
   quantity: number;
-  left: TreeNode<T>;
-  right: TreeNode<T>;
+  zero: TreeNode<T>;
+  one: TreeNode<T>;
 
   constructor(val: string) {
     this.key = val;
     this.quantity = 0;
-    this.left = null;
-    this.right = null;
+    this.zero = null;
+    this.one = null;
   }
 
   hasChild() {
-    return this.left != null || this.right != null;
+    return this.zero != null || this.one != null;
   }
 
   depth() {
-    const leftDepth = this.left?.depth() ?? 0;
-    const rightDepth = this.right?.depth() ?? 0;
+    const leftDepth = this.zero?.depth() ?? 0;
+    const rightDepth = this.one?.depth() ?? 0;
     return 1 + Math.max(0, leftDepth, rightDepth);
   }
 
   addChild(val: string) {
     if (val === '1') {
-      if (this.right == null) this.right = new TreeNode(val);
-      this.right.quantity += 1;
-      return this.right;
+      if (this.one == null) this.one = new TreeNode(val);
+      this.one.quantity += 1;
+      return this.one;
     } else {
-      if (this.left == null) this.left = new TreeNode(val);
-      this.left.quantity += 1;
-      return this.left;
+      if (this.zero == null) this.zero = new TreeNode(val);
+      this.zero.quantity += 1;
+      return this.zero;
     }
   }
 
@@ -45,12 +50,12 @@ export class TreeNode<T> {
    * @returns
    */
   getPathMostTravelled<T>() {
-    const oneMoreFrequent = this.right?.quantity >= this.left?.quantity;
-    const oneDeepOrDeeper = this.right?.depth() >= this.left?.depth();
+    const oneMoreFrequent = this.one?.quantity >= this.zero?.quantity;
+    const oneAsDeep = this.one?.depth() >= this.zero?.depth();
 
-    const oneWins = (oneMoreFrequent && oneDeepOrDeeper) || this.left == null;
+    const oneWins = (oneMoreFrequent && oneAsDeep) || this.zero == null;
     const selfKey = this.key ?? '';
-    const childKey = (oneWins ? this.right?.getPathMostTravelled() : this.left?.getPathMostTravelled()) ?? '';
+    const childKey = (oneWins ? this.one?.getPathMostTravelled() : this.zero?.getPathMostTravelled()) ?? '';
     return selfKey + childKey;
   }
   /**
@@ -58,18 +63,18 @@ export class TreeNode<T> {
    * @returns
    */
   getPathLeastTravelled<T>() {
-    const zeroLessFrequent = this.left?.quantity <= this.right?.quantity;
-    const zeroAsDeep = this.left?.depth() >= this.right?.depth();
+    const zeroLessFrequent = this.zero?.quantity <= this.one?.quantity;
+    const zeroAsDeep = this.zero?.depth() >= this.one?.depth();
 
-    const zeroWins = (zeroLessFrequent && zeroAsDeep) || this.right == null;
+    const zeroWins = (zeroLessFrequent && zeroAsDeep) || this.one == null;
     const selfKey = this.key ?? '';
-    const childKey = (zeroWins ? this.left?.getPathLeastTravelled() : this.right?.getPathLeastTravelled()) ?? '';
+    const childKey = (zeroWins ? this.zero?.getPathLeastTravelled() : this.one?.getPathLeastTravelled()) ?? '';
     return selfKey + childKey;
   }
 }
 
 /**
- * Builds binary tree, root node is a placeholder, left is always 0 and right 1 (when not null)
+ * Builds binary tree where the root node doesn't represent a value (key is undefined)
  * @param values
  * @returns
  */
