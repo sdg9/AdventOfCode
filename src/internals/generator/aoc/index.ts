@@ -60,7 +60,7 @@ export default {
       abortOnFail: true,
     });
 
-    const content = `npm run dev src\\${formattedYear}\\${formattedDay}\\`;
+    const content = `npm run dev src/${formattedYear}/${formattedDay}/`;
     clipboardy.writeSync(content); // to copy command to clipboard as next step is likely to run the generated code
     console.log(content);
     return actions;
