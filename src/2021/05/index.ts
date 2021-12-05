@@ -32,9 +32,9 @@ class Grid {
     this.values[y][x] = this.get(x, y) == null ? 1 : this.get(x, y) + 1;
   }
 
-  inBounds(bounds1: number, bounds2: number, target: number) {
+  private indexedStepInBounds(bounds1: number, bounds2: number, idx: number) {
     const step = Math.sign(bounds2 - bounds1);
-    return Math.abs(target * step) <= Math.abs(bounds2 - bounds1);
+    return Math.abs(idx * step) <= Math.abs(bounds2 - bounds1);
   }
 
   drawLine(input: number[]) {
@@ -43,7 +43,7 @@ class Grid {
     const xStep = Math.sign(x2 - x1);
     const yStep = Math.sign(y2 - y1);
 
-    for (let i = 0; this.inBounds(x1, x2, i * xStep) && this.inBounds(y1, y2, i * yStep); i++) {
+    for (let i = 0; this.indexedStepInBounds(x1, x2, i) && this.indexedStepInBounds(y1, y2, i); i++) {
       let x = x1 + i * xStep;
       let y = y1 + i * yStep;
       this.increment(x, y);
