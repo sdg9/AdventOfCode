@@ -1,32 +1,23 @@
 import readInput from '../../utils/readInput';
 import assert from 'assert';
 
-// type Line = {
-//   x1: number;
-//   y1: number;
-//   x2: number;
-//   y2: number;
-// };
-
-const parseInput = (input: string) => {
-  const values = input.split('\n').map((item) => item.split(' -> ').join(',').split(',').map(Number));
-  //   console.log('Values: ', values);
-  //   const [x1, y1, x2, y2] = values;
-  //   const line: Line = { x1, y1, x2, y2 };
-  //   return { x1, y1, x2, y2 };
-  return values;
-};
+const parseInput = (input: string) =>
+  input.split('\n').map((item) => item.split(' -> ').join(',').split(',').map(Number));
 
 const rawInput = readInput();
 const input = parseInput(rawInput);
-const ascending = (a, b) => a - b;
 
 /* Functions */
+const ascending = (a, b) => a - b;
+const isHorizontalOrVertical = (input: number[]) => {
+  const [x1, y1, x2, y2] = input;
+  return x1 === x2 || y1 === y2;
+};
+
 class Grid {
   values: number[][];
 
   constructor() {
-    // this.values = values;
     this.values = [];
   }
 
@@ -34,94 +25,64 @@ class Grid {
     return this.values[y]?.[x];
   }
 
+  increment(x: number, y: number) {
+    if (!Array.isArray(this.values[y])) {
+      this.values[y] = [];
+    }
+    this.values[y][x] = this.get(x, y) == null ? 1 : this.get(x, y) + 1;
+  }
+
+  inBounds(bounds1: number, bounds2: number, target: number) {
+    const step = Math.sign(bounds2 - bounds1);
+    return Math.abs(target * step) <= Math.abs(bounds2 - bounds1);
+  }
+
   drawLine(input: number[]) {
     const [x1, y1, x2, y2] = input;
 
-    // can't do this unless horizontal/veritcal
-    const [xMin, xMax] = [x1, x2].sort(ascending);
-    const [yMin, yMax] = [y1, y2].sort(ascending);
-    if (isHorizontalOrVertical(input)) {
-      // horizontal
-      for (let x = xMin; x <= xMax; x++) {
-        for (let y = yMin; y <= yMax; y++) {
-          if (!Array.isArray(this.values[y])) {
-            this.values[y] = [];
-          }
-          // currently draws every step, not what we want (e.g 5,5 -> 8,2 draws a square, not a line)
-          const point = this.values[y][x];
-          this.values[y][x] = point == null ? 1 : point + 1;
-        }
-      }
-    } else {
-      // diagonal
-      for (let i = 0; i <= xMax - xMin && i <= yMax - yMin; i++) {
-        let x = x1 + i * Math.sign(x2 - x1);
-        let y = y1 + i * Math.sign(y2 - y1);
-        if (!Array.isArray(this.values[y])) {
-          this.values[y] = [];
-        }
-        const point = this.values[y][x];
-        this.values[y][x] = point == null ? 1 : point + 1;
-      }
+    const xStep = Math.sign(x2 - x1);
+    const yStep = Math.sign(y2 - y1);
+
+    for (let i = 0; this.inBounds(x1, x2, i * xStep) && this.inBounds(y1, y2, i * yStep); i++) {
+      let x = x1 + i * xStep;
+      let y = y1 + i * yStep;
+      this.increment(x, y);
     }
+  }
+
+  getDuplicatePoints(value: number = 1) {
+    return this.values.reduce(
+      (totalOcurrences, row) =>
+        totalOcurrences +
+        row.reduce((rowOccurrences, col) => {
+          return rowOccurrences + (col > value ? 1 : 0);
+        }, 0),
+      0,
+    );
   }
 
   toString() {
     let retVal = '';
     for (let row = 0; row < this.values.length; row++) {
-      //   retVal[row] = [];
       retVal += '\n';
       for (let col = 0; col < this.values[row]?.length; col++) {
-        // retVal[row][col] = col ? col : '.';
         const point = this.values[row][col];
         retVal += point ? point : '.';
       }
     }
-    // const stringify = this.values.map((row) => {
-    //   return row.map((col) => {
-    //     return col ? col : '.';
-    //   });
-    // });
-    // return `\n[${stringify.join('\n')}]`;
-    // return `\n${retVal}`;
     return retVal;
-    // return JSON.stringify(stringify);
-    //     // return this.values;
-    //     // this.values.map(col => {
-
-    //     // })
-    //     // console.log(JSON.stringify(this.values));
-    //     // return 'hi';
-    //     return JSON.stringify(this.values);
   }
 }
-
-const isHorizontalOrVertical = (input: number[]) => {
-  const [x1, y1, x2, y2] = input;
-  return x1 === x2 || y1 === y2;
-};
 
 function part1(lines: number[][]): number {
   let grid = new Grid();
 
   lines.forEach((line) => {
     if (isHorizontalOrVertical(line)) {
-      //   console.log(line);
       grid.drawLine(line);
     }
   });
-
-  const count = grid.values.reduce((totalSum, row) => {
-    // return 1;
-    return (
-      totalSum +
-      row.reduce((rowSum, col) => {
-        return rowSum + (col > 1 ? 1 : 0);
-      }, 0)
-    );
-  }, 0);
-  //   console.log(`Grid Pt1: ${grid}`);
-  return count;
+  return grid.getDuplicatePoints();
 }
 
 function part2(lines: number[][]): number {
@@ -131,17 +92,7 @@ function part2(lines: number[][]): number {
     grid.drawLine(line);
   });
 
-  const count = grid.values.reduce((totalSum, row) => {
-    // return 1;
-    return (
-      totalSum +
-      row.reduce((rowSum, col) => {
-        return rowSum + (col > 1 ? 1 : 0);
-      }, 0)
-    );
-  }, 0);
-  //   console.log(`Grid Pt2: ${grid}`);
-  return count;
+  return grid.getDuplicatePoints();
 }
 
 /* Tests */
