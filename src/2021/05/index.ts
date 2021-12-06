@@ -53,10 +53,7 @@ class MultiDimensionMapWithLines extends MultiDimensionMap<number> {
   }
 
   getDuplicatePoints() {
-    return Object.entries(this.values).reduce((sum, item) => {
-      const [key, value] = item;
-      return sum + (value >= 2 ? 1 : 0);
-    }, 0);
+    return Object.entries(this.values).reduce((sum, [key, value]) => sum + (value >= 2 ? 1 : 0), 0);
   }
 }
 
