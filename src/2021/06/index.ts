@@ -51,7 +51,6 @@ function part1and2(values: number[], days: number): number {
 assert.strictEqual(part1and2([3, 4, 3, 1, 2], 80), 5934);
 assert.strictEqual(part1and2(input, 80), 345387);
 
-assert.strictEqual(part1and2([3, 4, 3, 1, 2], 80), 5934);
 assert.strictEqual(part1and2([3, 4, 3, 1, 2], 256), 26984457539);
 assert.strictEqual(part1and2(input, 256), 1574445493136);
 
