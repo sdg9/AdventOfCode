@@ -14,6 +14,55 @@ const isHorizontalOrVertical = (input: number[]) => {
   return x1 === x2 || y1 === y2;
 };
 
+/**
+ * Will work with negative coordinates as coordinate of say (-1, 2) is not represented as an array position, rather a key
+ */
+class MultiDimensionMap<T> {
+  values: Map<string, T>;
+  constructor() {
+    this.values = new Map();
+  }
+
+  get(key: string) {
+    return this.values[key];
+  }
+}
+
+class MultiDimensionMapWithLines extends MultiDimensionMap<number> {
+  increment(x: number, y: number) {
+    const key = `${x},${y}`;
+    this.values[key] = this.get(key) == null ? 1 : this.get(key) + 1;
+  }
+
+  private indexedStepInBounds(bounds1: number, bounds2: number, idx: number) {
+    const step = Math.sign(bounds2 - bounds1);
+    return Math.abs(idx * step) <= Math.abs(bounds2 - bounds1);
+  }
+
+  drawLine(input: number[]) {
+    const [x1, y1, x2, y2] = input;
+
+    const xStep = Math.sign(x2 - x1);
+    const yStep = Math.sign(y2 - y1);
+
+    for (let i = 0; this.indexedStepInBounds(x1, x2, i) && this.indexedStepInBounds(y1, y2, i); i++) {
+      let x = x1 + i * xStep;
+      let y = y1 + i * yStep;
+      this.increment(x, y);
+    }
+  }
+
+  getDuplicatePoints() {
+    return Object.entries(this.values).reduce((sum, item) => {
+      const [key, value] = item;
+      return sum + (value >= 2 ? 1 : 0);
+    }, 0);
+  }
+}
+
+/**
+ * Only supports zero and positive positions as it uses an array starting at 0,0 for representation
+ */
 class Grid {
   values: number[][];
 
@@ -84,6 +133,16 @@ function part1(lines: number[][]): number {
   });
   return grid.getDuplicatePoints();
 }
+function part1Alt(lines: number[][]): number {
+  let map = new MultiDimensionMapWithLines();
+
+  lines.forEach((line) => {
+    if (isHorizontalOrVertical(line)) {
+      map.drawLine(line);
+    }
+  });
+  return map.getDuplicatePoints();
+}
 
 function part2(lines: number[][]): number {
   let grid = new Grid();
@@ -93,6 +152,14 @@ function part2(lines: number[][]): number {
   });
 
   return grid.getDuplicatePoints();
+}
+function part2Alt(lines: number[][]): number {
+  let map = new MultiDimensionMapWithLines();
+
+  lines.forEach((line) => {
+    map.drawLine(line);
+  });
+  return map.getDuplicatePoints();
 }
 
 /* Tests */
@@ -115,6 +182,13 @@ assert.strictEqual(part1(input), 8111);
 
 assert.strictEqual(part2(parseInput(testData)), 12);
 assert.strictEqual(part2(input), 22088);
+
+// Alt implementation
+assert.strictEqual(part1Alt(parseInput(testData)), 5);
+assert.strictEqual(part1Alt(input), 8111);
+
+assert.strictEqual(part2Alt(parseInput(testData)), 12);
+assert.strictEqual(part2Alt(input), 22088);
 
 /* Results */
 
