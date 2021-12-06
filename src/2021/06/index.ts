@@ -6,31 +6,6 @@ const input = rawInput.split(',').map(Number);
 
 /* Functions */
 
-// Initial part 1 solution
-// const simulateLanternfishTick = (values: number[]): number[] => {
-//   let spawnedAge = 8;
-//   let spawned = 0;
-//   const tick = values.map((value: number) => {
-//     let nextValue = value - 1;
-//     if (nextValue < 0) {
-//       nextValue = 6;
-//       spawned += 1;
-//     }
-//     return nextValue;
-//   });
-
-//   const spanwedFish = Array.apply(null, Array(spawned)).map(() => spawnedAge);
-//   tick.push(...spanwedFish);
-//   return tick;
-// };
-
-// function part1(values: number[], days: number): number {
-//   for (let i = 0; i < days; i++) {
-//     values = simulateLanternfishTick(values);
-//   }
-//   return values.length;
-// }
-
 const inputToMap = (values: number[]): Map<number, number> => {
   let lanternFishMap = new Map<number, number>();
   values.forEach((value) => {
@@ -39,13 +14,17 @@ const inputToMap = (values: number[]): Map<number, number> => {
   return lanternFishMap;
 };
 
-const simulateLanternfishTickMap = (values: Map<number, number>): Map<number, number> => {
-  let spawnedAge = 8;
+const simulateLanternfishTick = (
+  values: Map<number, number>,
+  birthFrequency = 7,
+  spawnedAge = 8,
+): Map<number, number> => {
   let nextMap = new Map<number, number>();
   for (let [age, quantity] of values) {
     let nextAge = age - 1;
-    if (nextAge < 0) {
-      nextAge = 6;
+    const givesBirth = nextAge < 0;
+    if (givesBirth) {
+      nextAge = birthFrequency - 1;
       nextMap.set(spawnedAge, (nextMap.get(spawnedAge) ?? 0) + quantity);
     }
     nextMap.set(nextAge, (nextMap.get(nextAge) ?? 0) + quantity);
@@ -57,7 +36,7 @@ function part1and2(values: number[], days: number): number {
   let lanternFishMap = inputToMap(values);
 
   for (let i = 0; i < days; i++) {
-    lanternFishMap = simulateLanternfishTickMap(lanternFishMap);
+    lanternFishMap = simulateLanternfishTick(lanternFishMap);
   }
 
   let totalFish = 0;
