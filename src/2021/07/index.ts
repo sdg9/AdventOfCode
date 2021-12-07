@@ -10,6 +10,7 @@ const median = (array: number[]) => {
   const half = Math.floor(array.length / 2);
   return sorted[half];
 };
+const average = (array: number[]) => array.reduce((a, b) => a + b) / array.length;
 const fuelCost = (array: number[], target: number) => array.reduce((a, b) => a + Math.abs(target - b), 0);
 const nthTriangle = (n: number) => (Math.pow(n, 2) + n) / 2;
 const fuelCostNthTriangle = (array: number[], target: number) =>
@@ -20,19 +21,10 @@ function part1(values: number[]): number {
 }
 
 function part2(values: number[]): number {
-  const med = median(values);
-  let cost = fuelCostNthTriangle(values, med);
-
-  for (let i = 1; ; i++) {
-    let newCost = Math.min(fuelCostNthTriangle(values, med - i), fuelCostNthTriangle(values, med + i));
-    if (newCost < cost) {
-      cost = newCost;
-    } else {
-      break;
-    }
-  }
-
-  return cost;
+  const avg = average(values);
+  let cost1 = fuelCostNthTriangle(values, Math.floor(avg));
+  let cost2 = fuelCostNthTriangle(values, Math.ceil(avg));
+  return Math.min(cost1, cost2);
 }
 
 /* Tests */
