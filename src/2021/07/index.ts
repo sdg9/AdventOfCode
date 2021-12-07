@@ -1,5 +1,6 @@
 import readInput from '../../utils/readInput';
 import assert from 'assert';
+import { curry } from '../../utils/curry';
 
 const rawInput = readInput();
 const input = rawInput.split(',').map(Number);
@@ -15,6 +16,7 @@ const fuelCost = (array: number[], target: number) => array.reduce((a, b) => a +
 const nthTriangle = (n: number) => (Math.pow(n, 2) + n) / 2;
 const fuelCostNthTriangle = (array: number[], target: number) =>
   array.reduce((a, b) => a + nthTriangle(Math.abs(target - b)), 0);
+const curriedCostPt2 = curry(fuelCostNthTriangle);
 
 function part1(values: number[]): number {
   return fuelCost(values, median(values));
@@ -22,9 +24,8 @@ function part1(values: number[]): number {
 
 function part2(values: number[]): number {
   const avg = average(values);
-  let cost1 = fuelCostNthTriangle(values, Math.floor(avg));
-  let cost2 = fuelCostNthTriangle(values, Math.ceil(avg));
-  return Math.min(cost1, cost2);
+  const floorAndCeilAverageCosts = [Math.floor(avg), Math.ceil(avg)].map(curriedCostPt2(values));
+  return Math.min(...floorAndCeilAverageCosts);
 }
 
 /* Tests */
