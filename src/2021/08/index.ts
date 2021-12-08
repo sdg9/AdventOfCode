@@ -4,6 +4,9 @@ import assert from 'assert';
 const rawInput = readInput();
 
 const sorted = (input: string) => input.split('').sort().join('');
+/**
+ * Parse input | output and make sure each signal is sorted (for comparison later)
+ */
 const parse = (input) =>
   input.split('\n').map((v) =>
     v
@@ -15,18 +18,13 @@ const input = parse(rawInput);
 const demoInput = parse(readDemoInput());
 
 /* Functions */
-
 function part1(values: string[][][]): number {
   const desiredLengths = [2, 4, 3, 7];
-  let retVal = 0;
-  values.forEach(([signalPatterns, outputs]) => {
-    outputs.forEach((i) => {
-      if (desiredLengths.includes(i.length)) {
-        retVal += 1;
-      }
-    });
-  });
-  return retVal;
+  return values.reduce(
+    (totalSum, [signalPatterns, outputs]) =>
+      totalSum + outputs.reduce((sum, i) => sum + (desiredLengths.includes(i.length) ? 1 : 0), 0),
+    0,
+  );
 }
 
 const intersection = (a: string, b: string) => [...new Set(a)].filter((x) => b.includes(x)).join('');
@@ -37,20 +35,20 @@ const union = (...args: string[]) => {
   return [...new Set(combinedArgs)].join('');
 };
 
+/**
+ * 2 intersected with 5 s 8, 3 does not do this with 2 or 5 thus when I find the intersection of 8 (size 7) I know the other signal is a 3
+ */
 const identifyThree = (signals: string[]) => {
   const twoOrThreeOrFive = signals.filter((item) => item.length === 5);
   let [a, b, c] = twoOrThreeOrFive;
-  const results = [union(a, b), union(a, c), union(b, c)];
 
-  let three;
   if (union(a, b).length === 7) {
-    three = c;
+    return c;
   } else if (union(a, c).length === 7) {
-    three = b;
+    return b;
   } else {
-    three = a;
+    return a;
   }
-  return three;
 };
 
 const identifyTwoAndFive = (signals: string[], three: string, e: string) => {
@@ -66,12 +64,12 @@ const getNumberMapping = (signals: string[]) => {
   const seven = signals.find((item) => item.length === 3);
   const eight = signals.find((item) => item.length === 7);
   const nine = sorted(union(three, four));
-  const a = difference(seven, one);
+  //   const a = difference(seven, one); // unused
   const e = difference(eight, nine);
   const [two, five] = identifyTwoAndFive(signals, three, e);
   const bOrD = difference(four, one);
   const d = intersection(bOrD, two);
-  const b = difference(bOrD, d);
+  //   const b = difference(bOrD, d); // unused
   const zero = sorted(difference(eight, d));
   const six = signals.find((item) => item.length === 6 && item !== nine && item !== zero);
 
@@ -90,14 +88,11 @@ const getNumberMapping = (signals: string[]) => {
 };
 
 function part2(values: string[][][]): number {
-  let retVal = 0;
-  values.forEach((entry) => {
-    const [input, output] = entry;
+  return values.reduce((sum, [input, output]) => {
     const outputMapping = getNumberMapping(input);
     const finalNumber = parseInt(output.map((v) => outputMapping[sorted(v)]).join(''), 10);
-    retVal += finalNumber;
-  });
-  return retVal;
+    return sum + finalNumber;
+  }, 0);
 }
 
 /* Tests */
@@ -105,47 +100,39 @@ function part2(values: string[][][]): number {
 assert.strictEqual(part1(demoInput), 26);
 assert.strictEqual(part1(input), 548);
 
-// assert.strictEqual(
-//   part2(parse('acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf')),
-//   5353,
-// );
-// assert.strictEqual(
-//   part2(parse('acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf')),
-//   5353,
-// );
-// assert.strictEqual(
-//   part2(parse('edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc')),
-//   9781,
-// );
-// assert.strictEqual(part2(parse('fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg')), 1197);
-// assert.strictEqual(
-//   part2(parse('fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb')),
-//   9361,
-// );
-// assert.strictEqual(
-//   part2(parse('aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea')),
-//   4873,
-// );
-// assert.strictEqual(
-//   part2(parse('fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb')),
-//   8418,
-// );
-// assert.strictEqual(
-//   part2(parse('dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe')),
-//   4548,
-// );
+assert.strictEqual(
+  part2(parse('acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf')),
+  5353,
+);
+assert.strictEqual(
+  part2(parse('acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf')),
+  5353,
+);
+assert.strictEqual(
+  part2(parse('edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc')),
+  9781,
+);
+assert.strictEqual(part2(parse('fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg')), 1197);
+assert.strictEqual(
+  part2(parse('fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb')),
+  9361,
+);
+assert.strictEqual(
+  part2(parse('aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea')),
+  4873,
+);
+assert.strictEqual(
+  part2(parse('fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb')),
+  8418,
+);
+assert.strictEqual(
+  part2(parse('dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe')),
+  4548,
+);
 assert.strictEqual(
   part2(parse('bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef')),
   1625,
 );
-//
-//
-//
-//
-//
-//
-// egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
-// gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 assert.strictEqual(part2(demoInput), 61229);
 
 /* Results */
