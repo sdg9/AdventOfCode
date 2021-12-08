@@ -36,7 +36,7 @@ const union = (...args: string[]) => {
 };
 
 /**
- * 2 intersected with 5 s 8, 3 does not do this with 2 or 5 thus when I find the intersection of 8 (size 7) I know the other signal is a 3
+ * 2 intersected with 5 is 8, 3 does not do this with 2 or 5 thus when I find the intersection of 8 (size 7) I know the other signal is a 3
  */
 const identifyThree = (signals: string[]) => {
   const twoOrThreeOrFive = signals.filter((item) => item.length === 5);
@@ -57,6 +57,28 @@ const identifyTwoAndFive = (signals: string[], three: string, e: string) => {
   return [two, five];
 };
 
+/**
+ * Letter to signal mapping referenced in code 
+ *    0:      1:      2:      3:      4:
+ *   aaaa    ....    aaaa    aaaa    ....
+ *  b    c  .    c  .    c  .    c  b    c
+ *  b    c  .    c  .    c  .    c  b    c
+ *   ....    ....    dddd    dddd    dddd
+ *  e    f  .    f  e    .  .    f  .    f
+ *  e    f  .    f  e    .  .    f  .    f
+ *   gggg    ....    gggg    gggg    ....
+
+ *    5:      6:      7:      8:      9:
+ *   aaaa    aaaa    aaaa    aaaa    aaaa
+ *  b    .  b    .  .    c  b    c  b    c
+ *  b    .  b    .  .    c  b    c  b    c
+ *   dddd    dddd    ....    dddd    dddd
+ *  .    f  e    f  .    f  e    f  .    f
+ *  .    f  e    f  .    f  e    f  .    f
+ *   gggg    gggg    ....    gggg    gggg
+ * @param signals 
+ * @returns 
+ */
 const getNumberMapping = (signals: string[]) => {
   const one = signals.find((item) => item.length === 2);
   const three = identifyThree(signals);
@@ -144,4 +166,4 @@ const resultPart2 = part2(input);
 console.timeEnd('Time');
 
 console.log('Solution to part 1:', resultPart1);
-console.log('Solution to part 2:', resultPart2); //985086 too low, as is 1004691
+console.log('Solution to part 2:', resultPart2);
