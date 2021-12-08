@@ -1,6 +1,8 @@
 import readInput, { readDemoInput } from '../../utils/readInput';
 import assert from 'assert';
 import { difference, intersection, union } from '../../utils/set';
+import { permutations } from '../../utils/permuations';
+import { arrayToSingleNumber } from '../../utils/array';
 
 const rawInput = readInput();
 
@@ -28,25 +30,20 @@ function part1(values: string[][][]): number {
   );
 }
 
+const isLengthX = (x: number) => (i: string) => i.length === x;
+
 /**
  * 2 intersected with 5 is 8, 3 does not do this with 2 or 5 thus when I find the intersection of 8 (size 7) I know the other signal is a 3
  */
 const identifyThree = (signals: string[]) => {
-  const twoOrThreeOrFive = signals.filter((item) => item.length === 5);
-  let [a, b, c] = twoOrThreeOrFive;
-
-  if (union(a, b).length === 7) {
-    return c;
-  } else if (union(a, c).length === 7) {
-    return b;
-  } else {
-    return a;
-  }
+  const unordered235 = signals.filter(isLengthX(5));
+  return permutations(unordered235).reduce((acc: string, [a, b, c]) => (union(a, b).length === 7 ? c : acc), '');
 };
 
 const identifyTwoAndFive = (signals: string[], three: string, e: string) => {
-  const two = signals.find((item) => item.length === 5 && item.includes(e));
-  const five = signals.find((item) => item.length === 5 && item !== two && item !== three);
+  const length5Signals = signals.filter(isLengthX(5));
+  const two = length5Signals.find((item) => item.includes(e));
+  const five = length5Signals.find((item) => item !== two && item !== three);
   return [two, five];
 };
 
@@ -73,11 +70,11 @@ const identifyTwoAndFive = (signals: string[], three: string, e: string) => {
  * @returns 
  */
 const getNumberMapping = (signals: string[]) => {
-  const one = signals.find((item) => item.length === 2);
+  const one = signals.find(isLengthX(2));
   const three = identifyThree(signals);
-  const four = signals.find((item) => item.length === 4);
-  const seven = signals.find((item) => item.length === 3);
-  const eight = signals.find((item) => item.length === 7);
+  const four = signals.find(isLengthX(4));
+  const seven = signals.find(isLengthX(3));
+  const eight = signals.find(isLengthX(7));
   const nine = sorted(union(three, four));
   //   const a = difference(seven, one); // unused
   const e = difference(eight, nine);
@@ -86,27 +83,29 @@ const getNumberMapping = (signals: string[]) => {
   const d = intersection(bOrD, two);
   //   const b = difference(bOrD, d); // unused
   const zero = sorted(difference(eight, d));
-  const six = signals.find((item) => item.length === 6 && item !== nine && item !== zero);
+  const six = signals.filter(isLengthX(6)).find((item) => item !== nine && item !== zero);
 
-  return {
-    [sorted(one)]: 1,
-    [sorted(two)]: 2,
-    [sorted(three)]: 3,
-    [sorted(four)]: 4,
-    [sorted(five)]: 5,
-    [sorted(six)]: 6,
-    [sorted(seven)]: 7,
-    [sorted(eight)]: 8,
-    [sorted(nine)]: 9,
-    [sorted(zero)]: 0,
+  return (key: string) => {
+    const map = {
+      [sorted(one)]: 1,
+      [sorted(two)]: 2,
+      [sorted(three)]: 3,
+      [sorted(four)]: 4,
+      [sorted(five)]: 5,
+      [sorted(six)]: 6,
+      [sorted(seven)]: 7,
+      [sorted(eight)]: 8,
+      [sorted(nine)]: 9,
+      [sorted(zero)]: 0,
+    };
+    return map[key];
   };
 };
 
 function part2(values: string[][][]): number {
   return values.reduce((sum, [input, output]) => {
-    const outputMapping = getNumberMapping(input);
-    const finalNumber = parseInt(output.map((v) => outputMapping[sorted(v)]).join(''), 10);
-    return sum + finalNumber;
+    const numberMap = getNumberMapping(input);
+    return sum + arrayToSingleNumber(output.map(numberMap));
   }, 0);
 }
 
