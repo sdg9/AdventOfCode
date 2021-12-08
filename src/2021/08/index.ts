@@ -1,5 +1,6 @@
 import readInput, { readDemoInput } from '../../utils/readInput';
 import assert from 'assert';
+import { difference, intersection, union } from '../../utils/set';
 
 const rawInput = readInput();
 
@@ -26,14 +27,6 @@ function part1(values: string[][][]): number {
     0,
   );
 }
-
-const intersection = (a: string, b: string) => [...new Set(a)].filter((x) => b.includes(x)).join('');
-const difference = (a: string, b: string) => [...a].filter((x) => !b.includes(x)).join('');
-// const union = (a, b) => [...new Set([...a, ...b])].join('');
-const union = (...args: string[]) => {
-  const combinedArgs = args.reduce((a, b) => a + b);
-  return [...new Set(combinedArgs)].join('');
-};
 
 /**
  * 2 intersected with 5 is 8, 3 does not do this with 2 or 5 thus when I find the intersection of 8 (size 7) I know the other signal is a 3
