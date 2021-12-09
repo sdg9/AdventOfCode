@@ -3,15 +3,16 @@ import assert from 'assert';
 
 const rawInput = readInput();
 const input = rawInput.split('\n').map(Number);
+// const demoInput = parse(readDemoInput());
 
 /* Functions */
 
 function part1(values: number[]): number {
-return 0;
+  return 0;
 }
 
 function part2(values: number[]): number {
-return 0;
+  return 0;
 }
 
 /* Tests */
