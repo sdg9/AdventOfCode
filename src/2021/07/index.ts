@@ -1,19 +1,13 @@
 import readInput from '../../utils/readInput';
 import assert from 'assert';
 import { curry } from '../../utils/curry';
+import { average, median, nthTriangle } from '../../utils/math';
 
 const rawInput = readInput();
 const input = rawInput.split(',').map(Number);
 
 /* Functions */
-const median = (array: number[]) => {
-  const sorted = array.sort((a, b) => a - b);
-  const half = Math.floor(array.length / 2);
-  return sorted[half];
-};
-const average = (array: number[]) => array.reduce((a, b) => a + b) / array.length;
 const fuelCost = (array: number[], target: number) => array.reduce((a, b) => a + Math.abs(target - b), 0);
-const nthTriangle = (n: number) => (Math.pow(n, 2) + n) / 2;
 const fuelCostNthTriangle = (array: number[], target: number) =>
   array.reduce((a, b) => a + nthTriangle(Math.abs(target - b)), 0);
 const curriedCostPt2 = curry(fuelCostNthTriangle);
