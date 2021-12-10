@@ -1,5 +1,5 @@
 import * as path from 'path';
-import clipboardy from 'clipboardy';
+// import clipboardy from 'clipboardy';
 import axios from 'axios';
 
 export default {
@@ -61,7 +61,7 @@ export default {
     });
 
     const content = `npm run dev src/${formattedYear}/${formattedDay}/`;
-    clipboardy.writeSync(content); // to copy command to clipboard as next step is likely to run the generated code
+    // clipboardy.writeSync(content); // to copy command to clipboard as next step is likely to run the generated code
     console.log(content);
     return actions;
   },
