@@ -23,6 +23,12 @@ let points = {
   '>': 25137,
   undefined: 0,
 };
+let points2 = {
+  ')': 1,
+  ']': 2,
+  '}': 3,
+  '>': 4,
+};
 
 const processChunks = (line: string) => {
   let chunk: string[] = [];
@@ -54,8 +60,54 @@ function part1(values: string[]): number {
   return retVal;
 }
 
+const completeChunk = (line: string) => {
+  let chunk: string[] = [];
+  line.split('').forEach((c) => {
+    if (open.includes(c)) {
+      chunk.push(c);
+    } else if (properClose[chunk[chunk.length - 1]] === c) {
+      chunk.pop();
+    }
+  });
+
+  // Unwind Chunk
+
+  const finishChunk = chunk
+    .reverse()
+    .map((i) => properClose[i])
+    .join('');
+  //   console.log(finishChunk);
+  return finishChunk;
+};
+
+const scoreString = (input: string) => {
+  return input.split('').reduce((acc, v) => {
+    return acc * 5 + points2[v];
+  }, 0);
+};
+
+const median = (array: number[]) => {
+  const sorted = array.sort((a, b) => a - b);
+  const half = Math.floor(array.length / 2);
+  return sorted[half];
+};
 function part2(values: string[]): number {
-  return 0;
+  let incomplete: string[] = [];
+  values.forEach((line) => {
+    let invalidChar = processChunks(line);
+    if (invalidChar === undefined) {
+      incomplete.push(line);
+    }
+  });
+  //   console.log('Incompelte', incomplete);
+  let retVal = [];
+  incomplete.forEach((line) => {
+    let finish = completeChunk(line);
+    const score = scoreString(finish);
+    // console.log(`Finish: ${finish} with score ${score}`);
+    retVal.push(score);
+  });
+  return median(retVal);
 }
 
 /* Tests */
@@ -63,7 +115,8 @@ function part2(values: string[]): number {
 assert.strictEqual(part1(demoInput), 26397);
 assert.strictEqual(part1(input), 362271);
 
-// assert.strictEqual(part2([1, -1]), 0);
+assert.strictEqual(part2(demoInput), 288957);
+assert.strictEqual(part2(input), 1698395182);
 
 /* Results */
 
