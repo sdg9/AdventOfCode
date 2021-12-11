@@ -39,6 +39,18 @@ export class Grid<T> {
     }, 0);
   }
 
+  maxX(): number {
+    return this.values[0].length;
+  }
+
+  maxY(): number {
+    return this.values.length;
+  }
+
+  size() {
+    return this.maxX() * this.maxY();
+  }
+
   getVector(position: Vector2): T {
     return this.values?.[position.y]?.[position.x];
   }
