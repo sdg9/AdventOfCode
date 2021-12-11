@@ -43,12 +43,29 @@ export class Grid<T> {
     return this.values?.[position.y]?.[position.x];
   }
 
-  getNeighborPositions(position: Vector2): Vector2[] {
+  setVector(position: Vector2, value: T) {
+    this.values[position.y][position.x] = value;
+  }
+
+  getNeighborPositions(position: Vector2, includeAdjacent = false): Vector2[] {
     const north = new Vector2(0, -1);
     const east = new Vector2(1, 0);
     const south = new Vector2(0, 1);
     const west = new Vector2(-1, 0);
-    return [position.add(north), position.add(east), position.add(south), position.add(west)];
+
+    const northEast = new Vector2(1, -1);
+    const northWest = new Vector2(-1, -1);
+    const southEast = new Vector2(1, 1);
+    const southWest = new Vector2(-1, 1);
+    const diagonals = [
+      position.add(northEast),
+      position.add(northWest),
+      position.add(southEast),
+      position.add(southWest),
+    ];
+    const cardinal = [position.add(north), position.add(east), position.add(south), position.add(west)];
+
+    return includeAdjacent ? [...cardinal, ...diagonals] : cardinal;
   }
 
   getNeighborValues(position: Vector2) {
