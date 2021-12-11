@@ -56,29 +56,33 @@ const flash = (grid: Grid<number>, flashCount = 0) => {
 
 const tick = (grid: Grid<number>) => recoverFlashedRefactoryPeriod(flash(incrementAllPositions(grid)));
 
-function part1(values: string[], steps = 100): number {
-  let grid = parse(values);
+const takeSteps = (g: Grid<number>, steps: number, count: number = 0) => {
+  if (steps === 0) {
+    return count;
+  } else {
+    let { grid, flashCount } = tick(g);
+    return takeSteps(grid, steps - 1, count + flashCount);
+  }
+};
 
-  return Array.apply(null, Array(steps)).reduce((acc) => {
-    let updatedGrid = tick(grid);
-    grid = updatedGrid.grid;
-    return acc + updatedGrid.flashCount;
-  }, 0);
+function part1(values: string[], steps = 100): number {
+  return takeSteps(parse(values), 100);
 }
 
-const fullGridFlash = (grid: Grid<number>, currentStep = 0) => {
-  let { flashCount, grid: updatedGrid } = tick(grid);
-  if (flashCount === grid.size()) {
+const getStepsRequiredForSynchronizedGridFlash = (g: Grid<number>, currentStep = 0) => {
+  let { flashCount, grid } = tick(g);
+  if (flashCount === g.size()) {
     return currentStep + 1;
   } else {
-    return fullGridFlash(updatedGrid, currentStep + 1);
+    return getStepsRequiredForSynchronizedGridFlash(grid, currentStep + 1);
   }
 };
 
 function part2(values: string[]): number {
-  return fullGridFlash(parse(values));
+  return getStepsRequiredForSynchronizedGridFlash(parse(values));
 }
 
+assert.strictEqual(part1(demoInput), 1656);
 assert.strictEqual(part1(input), 1667);
 assert.strictEqual(part2(demoInput), 195);
 assert.strictEqual(part2(input), 488);
