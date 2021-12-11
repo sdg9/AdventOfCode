@@ -12,6 +12,20 @@ export class Grid<T> {
     this.values = values;
   }
 
+  flat() {
+    // return this.values.flat();
+    return this.values
+      .map((rowValue, y) => {
+        return rowValue.map((colValue, x) => {
+          return {
+            position: new Vector2(x, y),
+            value: colValue,
+          };
+        });
+      })
+      .flat();
+  }
+
   forEach(cb: (position: Vector2, value: T) => void) {
     this.values.forEach((rowValue, y) => {
       rowValue.forEach((colValue, x) => {

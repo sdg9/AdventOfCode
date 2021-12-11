@@ -13,87 +13,72 @@ function parse(values: string[]) {
   return new Grid(parsed);
 }
 
-const incrementEnergyAllPositions = (grid: Grid<number>) => {
+const inRefactoryPeriod = -1;
+const isNotInRefactoryPeriod = (val: number) => val >= 0;
+
+const incrementAllPositions = (grid: Grid<number>) => {
   return new Grid(grid.map((pos, val) => val + 1));
 };
 
-const resetFlashedPositions = (grid: Grid<number>) => {
-  return new Grid(grid.map((pos, val) => (val < 0 ? 0 : val)));
+const recoverFlashedRefactoryPeriod = ({ grid, flashCount }: { grid: Grid<number>; flashCount: number }) => {
+  return { grid: new Grid(grid.map((pos, val) => (isNotInRefactoryPeriod(val) ? val : 0))), flashCount };
 };
 
-const flash = (grid: Grid<any>, timesFlashed = 0) => {
-  const flashPositions = [];
-
-  grid.forEach((pos, val) => {
-    if (val > 9) {
-      flashPositions.push(pos);
-      timesFlashed += 1;
-      // console.log('flash');
-    }
-  });
-  // console.log('FP: ', flashPositions);
+/**
+ * Any octopus with an energy level greater than 9 flashes increases the energy level of all adjacent octopuses by 1
+ * @param grid
+ * @param flashCount
+ * @returns
+ */
+const flash = (grid: Grid<number>, flashCount = 0) => {
+  const flashPositions = grid
+    .flat()
+    .filter(({ position, value }) => value > 9)
+    .map(({ position }) => position);
 
   if (flashPositions.length === 0) {
-    // return grid;
-    return { flashedGrid: grid, timesFlashed };
+    return { grid, flashCount };
   }
 
-  // resolve flash
-  flashPositions.forEach((pos) => {
-    const neighbors = grid.getNeighborPositions(pos, true);
-
-    // increment neighbor
-    neighbors.forEach((neighborPos) => {
-      const neighborValue = grid.getVector(neighborPos);
-      if (neighborValue >= 0) {
-        grid.setVector(neighborPos, neighborValue + 1);
+  flashPositions.forEach((currentPosition) => {
+    grid.getNeighborPositions(currentPosition, true).forEach((neighbor) => {
+      const neighborValue = grid.getVector(neighbor);
+      if (isNotInRefactoryPeriod(neighborValue)) {
+        grid.setVector(neighbor, neighborValue + 1);
       }
     });
 
-    // reduce processed flash
-    grid.setVector(pos, -1);
+    grid.setVector(currentPosition, inRefactoryPeriod);
   });
 
-  // return flash(grid, timesFlashed);
-  // repeat
-  return flash(grid, timesFlashed);
+  return flash(grid, flashCount + flashPositions.length);
 };
 
-const tick = (grid: Grid<number>) => {
-  let incremented = incrementEnergyAllPositions(grid);
-  let { flashedGrid, timesFlashed } = flash(incremented);
-  let flashCooldown = resetFlashedPositions(flashedGrid);
-  return { grid: flashCooldown, timesFlashed };
-};
+const tick = (grid: Grid<number>) => recoverFlashedRefactoryPeriod(flash(incrementAllPositions(grid)));
 
 function part1(values: string[], steps = 100): number {
   let grid = parse(values);
 
-  let totalFlashes = 0;
-  for (let i = 0; i < steps; i++) {
+  return Array.apply(null, Array(steps)).reduce((acc) => {
     let updatedGrid = tick(grid);
-    totalFlashes += updatedGrid.timesFlashed;
     grid = updatedGrid.grid;
-  }
-  return totalFlashes;
+    return acc + updatedGrid.flashCount;
+  }, 0);
 }
+
+const fullGridFlash = (grid: Grid<number>, currentStep = 0) => {
+  let { flashCount, grid: updatedGrid } = tick(grid);
+  if (flashCount === grid.size()) {
+    return currentStep + 1;
+  } else {
+    return fullGridFlash(updatedGrid, currentStep + 1);
+  }
+};
 
 function part2(values: string[]): number {
-  let grid = parse(values);
-
-  let step = 0;
-  let totalFlashes = 0;
-
-  while (totalFlashes !== grid.size()) {
-    step += 1;
-    let updatedGrid = tick(grid);
-    totalFlashes = updatedGrid.timesFlashed;
-    grid = updatedGrid.grid;
-  }
-  return step;
+  return fullGridFlash(parse(values));
 }
 
-assert.strictEqual(part1(demoInput), 1656);
 assert.strictEqual(part1(input), 1667);
 assert.strictEqual(part2(demoInput), 195);
 assert.strictEqual(part2(input), 488);
