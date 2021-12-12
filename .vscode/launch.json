@@ -6,6 +6,7 @@
     "configurations": [
 
 
+
         {
             "type": "pwa-node",
             "request": "launch",
@@ -13,7 +14,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/src/2021/09/index.ts",
+            "program": "${workspaceFolder}/src/2021/12/index.ts",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
@@ -25,7 +26,7 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
 
-      "args": ["src/2021/09/index.ts"],
+      "args": ["src/2021/12/index.ts"],
       
       "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",
