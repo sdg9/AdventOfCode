@@ -50,6 +50,7 @@ export class Queue<T> {
   }
 }
 
+export const stringCompare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 export class Graph<T> {
   nodes: Map<T, Node<T>> = new Map();
   comparator: (a: T, b: T) => number;
